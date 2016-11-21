@@ -5,8 +5,10 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
@@ -23,7 +25,27 @@ public class Assets implements Disposable,AssetErrorListener {
     public AssetGoldCoin goldCoin;
     public AssetFeather feather;
     public AssetLevelDecoration levelDecoration;
+    public AssetFonts fonts;
+    public class AssetFonts{
+        public final BitmapFont defaultSmall;
+        public final BitmapFont defaultNormal;
+        public final BitmapFont defaultBig;
+        public AssetFonts(){
+            FreeTypeFontGenerator generator=new FreeTypeFontGenerator(Gdx.files.internal("fonts/calibri.ttf"));
+            FreeTypeFontGenerator.FreeTypeFontParameter parameter=new FreeTypeFontGenerator.FreeTypeFontParameter();
+            parameter.size=12;
+            defaultSmall=generator.generateFont(parameter);
+            parameter.size=18;
+            defaultNormal=generator.generateFont(parameter);
+            parameter.size=32;
+            defaultBig=generator.generateFont(parameter);
 
+            defaultSmall.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            defaultNormal.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            defaultBig.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        }
+    }
     public void init(AssetManager assetManager) {
         this.assetManager = assetManager;
         assetManager.setErrorListener(this);
@@ -37,6 +59,7 @@ public class Assets implements Disposable,AssetErrorListener {
         for (Texture t : atlas.getTextures()) {
             t.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         }
+        fonts=new AssetFonts();
         bunny = new AssetBunny(atlas);
         rock = new AssetRock(atlas);
         goldCoin = new AssetGoldCoin(atlas);
@@ -51,6 +74,9 @@ public class Assets implements Disposable,AssetErrorListener {
     @Override
     public void dispose() {
         assetManager.dispose();
+        fonts.defaultSmall.dispose();
+        fonts.defaultNormal.dispose();
+        fonts.defaultBig.dispose();
     }
     public class AssetBunny{
         public final TextureAtlas.AtlasRegion head;
